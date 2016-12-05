@@ -5,11 +5,12 @@
   "main": "index.js",
   "author": "Grant Timmerman",
   "private": true,
-  "license": "BSD",
+  "license": "UNLICENSED",
   "dependencies": {
     "express": "4.13.4"
   },
   "scripts": {
     "start": "node index.js"
-  }
+  },
+  "devDependencies": {}
 }

@@ -7,7 +7,7 @@ $(function() {
     '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
   ];
 
-  // Initialize variables
+  // Инициализируем переменные
   var $window = $(window);
   var $usernameInput = $('.usernameInput'); // Input for username
   var $messages = $('.messages'); // Messages area
@@ -16,7 +16,7 @@ $(function() {
   var $loginPage = $('.login.page'); // The login page
   var $chatPage = $('.chat.page'); // The chatroom page
 
-  // Prompt for setting a username
+  // Подсказки для username
   var username;
   var connected = false;
   var typing = false;
@@ -28,55 +28,55 @@ $(function() {
   function addParticipantsMessage (data) {
     var message = '';
     if (data.numUsers === 1) {
-      message += "there's 1 participant";
+      message += "Ты пока один(";
     } else {
-      message += "there are " + data.numUsers + " participants";
+      message += "У нас пополнение, теперь ты не один) тута " + data.numUsers + " участника";
     }
     log(message);
   }
 
-  // Sets the client's username
+  // Задаем имя клиента
   function setUsername () {
     username = cleanInput($usernameInput.val().trim());
 
-    // If the username is valid
+    // Проверка на действительность имени пользователя
     if (username) {
       $loginPage.fadeOut();
       $chatPage.show();
       $loginPage.off('click');
       $currentInput = $inputMessage.focus();
 
-      // Tell the server your username
+      // Отправка на сервер вашего Username
       socket.emit('add user', username);
     }
   }
 
-  // Sends a chat message
+  // Отправка сообщения в чат
   function sendMessage () {
     var message = $inputMessage.val();
-    // Prevent markup from being injected into the message
+    // Очистка поля ввода
     message = cleanInput(message);
-    // if there is a non-empty message and a socket connection
+    // Если поле ввода непустое проезвести подключение
     if (message && connected) {
       $inputMessage.val('');
       addChatMessage({
         username: username,
         message: message
       });
-      // tell server to execute 'new message' and send along one parameter
+      // Сказать серверу выподнить 'new message' и отправит параметр
       socket.emit('new message', message);
     }
   }
 
-  // Log a message
+  // Лог сообщения
   function log (message, options) {
     var $el = $('<li>').addClass('log').text(message);
     addMessageElement($el, options);
   }
 
-  // Adds the visual chat message to the message list
+  // Добавляет визуальный чат
   function addChatMessage (data, options) {
-    // Don't fade the message in if there is an 'X was typing'
+    // Не показ сообщение, если 'X' печатает
     var $typingMessages = getTypingMessages(data);
     options = options || {};
     if ($typingMessages.length !== 0) {
@@ -99,29 +99,27 @@ $(function() {
     addMessageElement($messageDiv, options);
   }
 
-  // Adds the visual chat typing message
+  // Добавляет набор сообщение в визуальный чат
   function addChatTyping (data) {
     data.typing = true;
     data.message = 'is typing';
     addChatMessage(data);
   }
 
-  // Removes the visual chat typing message
+  // Удаляет сообщения после набра в визуальном чате
   function removeChatTyping (data) {
     getTypingMessages(data).fadeOut(function () {
       $(this).remove();
     });
   }
 
-  // Adds a message element to the messages and scrolls to the bottom
-  // el - The element to add as a message
-  // options.fade - If the element should fade-in (default = true)
-  // options.prepend - If the element should prepend
-  //   all other messages (default = false)
+  // Добавляет элемент сообщени к сообщениям и прокручивается на дно
+  // el - Элемент для добавления вида сообщения
+  
   function addMessageElement (el, options) {
     var $el = $(el);
 
-    // Setup default options
+    // установить стандартные настройки
     if (!options) {
       options = {};
     }
@@ -132,7 +130,7 @@ $(function() {
       options.prepend = false;
     }
 
-    // Apply options
+    // Применить параметры
     if (options.fade) {
       $el.hide().fadeIn(FADE_TIME);
     }
@@ -144,12 +142,12 @@ $(function() {
     $messages[0].scrollTop = $messages[0].scrollHeight;
   }
 
-  // Prevents input from having injected markup
+  // Предотврвщение захода текста на разметку
   function cleanInput (input) {
     return $('<div/>').text(input).text();
   }
 
-  // Updates the typing event
+  // Обновления события набора текста
   function updateTyping () {
     if (connected) {
       if (!typing) {
@@ -169,21 +167,21 @@ $(function() {
     }
   }
 
-  // Gets the 'X is typing' messages of a user
+  // Получить 'X is typing' сообщения от пользователя
   function getTypingMessages (data) {
     return $('.typing.message').filter(function (i) {
       return $(this).data('username') === data.username;
     });
   }
 
-  // Gets the color of a username through our hash function
+  // Получает цвет имени пользователя через нашу хэш-функции
   function getUsernameColor (username) {
-    // Compute hash code
+    // Вычисление hash code
     var hash = 7;
     for (var i = 0; i < username.length; i++) {
        hash = username.charCodeAt(i) + (hash << 5) - hash;
     }
-    // Calculate color
+    // Подсчет color
     var index = Math.abs(hash % COLORS.length);
     return COLORS[index];
   }
@@ -191,11 +189,11 @@ $(function() {
   // Keyboard events
 
   $window.keydown(function (event) {
-    // Auto-focus the current input when a key is typed
+    // Авто-фокус текущего входа, когда key набирается
     if (!(event.ctrlKey || event.metaKey || event.altKey)) {
       $currentInput.focus();
     }
-    // When the client hits ENTER on their keyboard
+    // Нажатие на Enter
     if (event.which === 13) {
       if (username) {
         sendMessage();
@@ -213,30 +211,30 @@ $(function() {
 
   // Click events
 
-  // Focus input when clicking anywhere on login page
+  // Курсор на input когда нажимаеш куда либо на login page
   $loginPage.click(function () {
     $currentInput.focus();
   });
 
-  // Focus input when clicking on the message input's border
+  // Курсор на input когда нажимаеш куда либо на message input's border
   $inputMessage.click(function () {
     $inputMessage.focus();
   });
 
   // Socket events
 
-  // Whenever the server emits 'login', log the login message
+  // Кргда либо сервер emits 'login', log the login message
   socket.on('login', function (data) {
     connected = true;
-    // Display the welcome message
-    var message = "Welcome to Socket.IO Chat – ";
+    // Отобразить окно приветствия
+    var message = "Добро пожаловать в чатик на Socket.IO ";
     log(message, {
       prepend: true
     });
     addParticipantsMessage(data);
   });
 
-  // Whenever the server emits 'new message', update the chat body
+  // Whenever the server emits 'new message', обновить тело chat
   socket.on('new message', function (data) {
     addChatMessage(data);
   });
@@ -254,12 +252,12 @@ $(function() {
     removeChatTyping(data);
   });
 
-  // Whenever the server emits 'typing', show the typing message
+  // Whenever the server emits 'typing', показывать набор message
   socket.on('typing', function (data) {
     addChatTyping(data);
   });
 
-  // Whenever the server emits 'stop typing', kill the typing message
+  // Whenever the server emits 'stop typing', удалить message
   socket.on('stop typing', function (data) {
     removeChatTyping(data);
   });
